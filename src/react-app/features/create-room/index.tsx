@@ -1,35 +1,7 @@
-import { useState } from 'react';
-import { useLocation } from 'wouter';
+import { useCreateRoom } from './hooks/useCreateRoom';
 
 export function CreateRoomPage() {
-  const [, setLocation] = useLocation();
-  const [isCreating, setIsCreating] = useState(false);
-
-  const handleCreateRoom = async () => {
-    if (isCreating) return;
-
-    setIsCreating(true);
-    try {
-      const response = await fetch('/api/rooms', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create room');
-      }
-
-      const data = await response.json();
-      setLocation(`/room/${data.roomId}`);
-    } catch (error) {
-      console.error('Room creation failed:', error);
-      // エラーハンドリング（必要に応じてユーザーに通知）
-    } finally {
-      setIsCreating(false);
-    }
-  };
+  const createRoomMutation = useCreateRoom();
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex flex-col items-center justify-center px-4'>
@@ -43,14 +15,24 @@ export function CreateRoomPage() {
           </p>
         </div>
 
-        <button
-          type='button'
-          onClick={handleCreateRoom}
-          disabled={isCreating}
-          className='w-full bg-gray-800 hover:bg-gray-700 disabled:bg-gray-900 disabled:cursor-not-allowed text-white font-medium py-4 px-8 rounded-xl transition duration-300 border border-gray-700 hover:border-gray-600 disabled:border-gray-800 shadow-lg hover:shadow-xl disabled:shadow-none'
-        >
-          {isCreating ? 'Creating Room...' : 'Create Chat Room'}
-        </button>
+        <div className='w-full space-y-4'>
+          <button
+            type='button'
+            onClick={() => createRoomMutation.mutate()}
+            disabled={createRoomMutation.isPending}
+            className='w-full bg-gray-800 hover:bg-gray-700 disabled:bg-gray-900 disabled:cursor-not-allowed text-white font-medium py-4 px-8 rounded-xl transition duration-300 border border-gray-700 hover:border-gray-600 disabled:border-gray-800 shadow-lg hover:shadow-xl disabled:shadow-none'
+          >
+            {createRoomMutation.isPending
+              ? 'Creating Room...'
+              : 'Create Chat Room'}
+          </button>
+
+          {createRoomMutation.error && (
+            <div className='text-red-400 text-sm text-center'>
+              Failed to create room. Please try again.
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
