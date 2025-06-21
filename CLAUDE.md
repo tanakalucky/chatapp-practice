@@ -8,17 +8,17 @@ Claude Codeはこのリポジトリで作業する際、**日本語で回答**�
 
 ## Project Architecture
 
-This is a full-stack React application that runs on Cloudflare Workers, combining:
+This is a chat application built as a full-stack React app that runs on Cloudflare Workers, combining:
 - **Frontend**: React 19 + Vite with Tailwind CSS
 - **Backend**: Hono.js framework running on Cloudflare Workers
 - **Routing**: Wouter for client-side routing
 - **State Management**: TanStack Query for server state
-- **Styling**: Tailwind CSS v4 with CSS variables
+- **Styling**: Tailwind CSS v4 only (no component libraries)
 
 ### Key Structure
 - `src/react-app/` - React frontend application
 - `src/worker/` - Hono backend API running on Cloudflare Workers
-- `src/lib/` - Shared utilities
+- `src/test/` - Test files
 
 ### Dual Environment Setup
 The app runs as both a traditional SPA and a Cloudflare Worker:
@@ -70,7 +70,14 @@ Pre-commit hooks via lefthook automatically run Biome checks on staged files.
 ## Styling Guidelines
 
 - Uses Tailwind CSS v4 (not v3) with the new Vite plugin
+- No component libraries (no shadcn/ui) - use Tailwind classes directly
 - Path alias `@/` maps to `src/`
+
+## Application Language
+
+- **UI Text**: All user-facing text must be in English
+- **Code Comments**: Japanese for development team communication
+- **Documentation**: Japanese for internal documentation
 
 ## Worker Configuration
 

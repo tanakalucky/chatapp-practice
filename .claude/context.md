@@ -1,14 +1,19 @@
 # プロジェクト背景とコンテキスト
 
 ## プロジェクト概要
-Cloudflare Workers上で動作するフルスタックReactアプリケーション
+Cloudflare Workers上で動作するフルスタックReactチャットアプリケーション
 
 ## 技術スタック
 - **フロントエンド**: React 19 + Vite
 - **バックエンド**: Hono.js（Cloudflare Workers）
 - **ルーティング**: Wouter（クライアントサイド）
 - **状態管理**: TanStack Query（サーバー状態）
-- **スタイリング**: Tailwind CSS v4 + shadcn/ui（New Yorkスタイル）
+- **スタイリング**: Tailwind CSS v4 単体使用
+
+## アプリケーション言語設定
+- **UI テキスト**: 英語のみ - すべてのユーザー向けテキストは英語で記述
+- **コードコメント**: 開発チーム間のコミュニケーションは日本語
+- **ドキュメント**: 内部ドキュメントは日本語
 
 ## アーキテクチャの制約
 - Cloudflare Workersの制約に従う必要がある

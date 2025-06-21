@@ -13,8 +13,7 @@
 - **Cloudflare Workers**: エッジコンピューティング環境
 
 ### スタイリング
-- **Tailwind CSS v4**: 最新のCSS変数サポート
-- **shadcn/ui**: New Yorkスタイルで統一
+- **Tailwind CSS v4**: 最新のCSS変数サポート（単体使用）
 - **パスエイリアス**: `@/`で`src/`にマップ
 
 ## 実装パターン
@@ -23,9 +22,14 @@
 ```
 src/
 ├── react-app/       # Reactアプリケーション
+│   ├── features/    # 機能別ディレクトリ
+│   │   ├── create-room/   # ルーム作成機能
+│   │   ├── chat-room/     # チャットルーム機能
+│   │   └── route/         # ルーティング設定
+│   ├── components/  # 共通コンポーネント
+│   └── hooks/       # 共通フック
 ├── worker/          # Honoバックエンド
-├── components/ui/   # shadcn/uiコンポーネント
-└── lib/            # 共有ユーティリティ
+└── test/           # テストファイル
 ```
 
 ### 開発フロー

@@ -40,12 +40,12 @@ npm run build
 
 ### React コンポーネント
 ```tsx
-import { Button } from "@/components/ui/button"
-
 export function MyComponent() {
   return (
     <div className="flex items-center gap-4">
-      <Button variant="default">Click me</Button>
+      <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+        Click me
+      </button>
     </div>
   )
 }
@@ -83,15 +83,28 @@ function useApiData() {
 
 ### コンポーネント作成
 ```
-src/components/
-├── ui/              # shadcn/uiコンポーネント
-│   ├── button.tsx
+src/react-app/
+├── features/        # 機能別ディレクトリ
+│   ├── create-room/
+│   │   ├── components/  # create-room専用コンポーネント
+│   │   ├── hooks/       # create-room専用フック
+│   │   └── index.tsx    # メインコンポーネント
+│   ├── chat-room/
+│   │   ├── components/  # chat-room専用コンポーネント
+│   │   ├── hooks/       # chat-room専用フック
+│   │   └── index.tsx    # メインコンポーネント
+│   └── route/
+│       ├── components/  # route専用コンポーネント
+│       ├── hooks/       # route専用フック
+│       └── index.tsx    # ルーティング設定
+├── components/      # 共通コンポーネント
+│   ├── ErrorBoundary.tsx
+│   ├── LoadingSpinner.tsx
 │   └── ...
-├── feature/         # 機能別コンポーネント
-│   ├── Header.tsx
+├── hooks/           # 共通フック
+│   ├── useApi.ts
 │   └── ...
-└── common/          # 共通コンポーネント
-    ├── Layout.tsx
+└── assets/          # 静的アセット
     └── ...
 ```
 
@@ -99,12 +112,7 @@ src/components/
 ```
 src/worker/
 ├── index.ts         # メインエントリポイント
-├── routes/          # ルート定義
-│   ├── api.ts
-│   └── ...
-└── utils/           # ユーティリティ
-    ├── response.ts
-    └── ...
+└── env.ts          # 環境変数定義
 ```
 
 ## 設定パターン
@@ -121,11 +129,7 @@ src/worker/
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  /* CSS変数でテーマ設定 */
-  --background: 0 0% 100%;
-  --foreground: 0 0% 3.9%;
-}
+/* Custom CSS variables can be defined here if needed */
 ```
 
 ## デバッグパターン
