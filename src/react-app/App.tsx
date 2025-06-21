@@ -1,71 +1,41 @@
-// src/App.tsx
+import { Route, Router } from 'wouter';
+import { useLocation } from 'wouter';
 
-import { useState } from 'react';
-import viteLogo from '/vite.svg';
-import cloudflareLogo from './assets/Cloudflare_Logo.svg';
-import honoLogo from './assets/hono.svg';
-import reactLogo from './assets/react.svg';
-import './App.css';
+function HomePage() {
+  const [, setLocation] = useLocation();
 
-function App() {
-  const [count, setCount] = useState(0);
-  const [name, setName] = useState('unknown');
+  const handleCreateRoom = () => {
+    const roomId = crypto.randomUUID();
+    setLocation(`/room/${roomId}`);
+  };
 
   return (
-    <>
-      <div>
-        <a href='https://vite.dev' target='_blank' rel='noreferrer'>
-          <img src={viteLogo} className='logo' alt='Vite logo' />
-        </a>
-        <a href='https://react.dev' target='_blank' rel='noreferrer'>
-          <img src={reactLogo} className='logo react' alt='React logo' />
-        </a>
-        <a href='https://hono.dev/' target='_blank' rel='noreferrer'>
-          <img src={honoLogo} className='logo cloudflare' alt='Hono logo' />
-        </a>
-        <a
-          href='https://workers.cloudflare.com/'
-          target='_blank'
-          rel='noreferrer'
-        >
-          <img
-            src={cloudflareLogo}
-            className='logo cloudflare'
-            alt='Cloudflare logo'
-          />
-        </a>
-      </div>
-      <h1>Vite + React + Hono + Cloudflare</h1>
-      <div className='card'>
-        <button
-          type='button'
-          onClick={() => setCount((count) => count + 1)}
-          aria-label='increment'
-        >
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <div className='card'>
-        <button
-          type='button'
-          onClick={() => {
-            fetch('/api/')
-              .then((res) => res.json() as Promise<{ name: string }>)
-              .then((data) => setName(data.name));
-          }}
-          aria-label='get name'
-        >
-          Name from API is: {name}
-        </button>
-        <p>
-          Edit <code>worker/index.ts</code> to change the name
-        </p>
-      </div>
-      <p className='read-the-docs'>Click on the logos to learn more</p>
-    </>
+    <div className='flex justify-center items-center min-h-screen'>
+      <button
+        type='button'
+        onClick={handleCreateRoom}
+        className='bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-300'
+      >
+        Create Chat Room
+      </button>
+    </div>
+  );
+}
+
+function RoomPage({ params }: { params: { id: string } }) {
+  return (
+    <div className='flex flex-col justify-center items-center min-h-screen'>
+      <h1 className='text-3xl font-bold text-gray-800'>Room ID: {params.id}</h1>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <Route path='/' component={HomePage} />
+      <Route path='/room/:id' component={RoomPage} />
+    </Router>
   );
 }
 
