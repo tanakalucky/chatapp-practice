@@ -17,7 +17,10 @@
       "Bash(npx wrangler:*)",
       "mcp__cloudflare-document__search_cloudflare_documentation",
       "Bash(npm run check:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npm test:*)",
+      "Bash(rm:*)",
+      "Bash(npm run test:*)"
     ],
     "deny": []
   },
