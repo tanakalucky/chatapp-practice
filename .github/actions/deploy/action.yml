@@ -1,5 +1,5 @@
 name: Deploy action
-description: Deploy to Cloudflare pages
+description: Deploy to Cloudflare Workers
 
 inputs:
   cloudflare-api-token:
@@ -37,4 +37,4 @@ runs:
       with:
         apiToken: ${{ inputs.cloudflare-api-token }}
         accountId: ${{ inputs.cloudflare-account-id }}
-        command: pages deploy --branch ${{ inputs.branch-name }}
+        command: deploy --env ${{ inputs.branch-name }}
