@@ -21,7 +21,13 @@
     "rules": {
       "recommended": true
     },
-    "ignore": ["worker-configuration.d.ts", "main.tsx"]
+    "ignore": [
+      "worker-configuration.d.ts",
+      "main.tsx",
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/__tests__/**"
+    ]
   },
   "javascript": {
     "formatter": {
