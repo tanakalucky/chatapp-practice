@@ -8,8 +8,15 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(git add:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(wrangler auth:*)",
+      "Bash(npx wrangler auth:*)",
+      "Bash(npx wrangler:*)"
     ],
     "deny": []
-  }
+  },
+  "enabledMcpjsonServers": ["cloudflare-document"]
 }
