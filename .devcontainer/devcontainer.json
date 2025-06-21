@@ -13,5 +13,12 @@
     "ghcr.io/devcontainers/features/node:1": {},
     "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
   },
-  "runArgs": ["--init"]
+  "runArgs": ["--init"],
+  "mounts": [
+    {
+      "source": "${localEnv:HOME}/.config/zed",
+      "target": "/home/vscode/.config/zed",
+      "type": "bind"
+    }
+  ]
 }
