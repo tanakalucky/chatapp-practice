@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import type { Env } from './env';
+import { RoomObject } from './room-object';
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -23,6 +24,20 @@ app.get('/api/health', (c) =>
   c.json({ status: 'ok', timestamp: new Date().toISOString() }),
 );
 
+// 部屋作成API
+app.post('/api/rooms', async (c) => {
+  try {
+    // 新しいDurable ObjectのIDを生成
+    const roomId = c.env.ROOM.newUniqueId();
+
+    // 部屋IDを文字列として返す
+    return c.json({ roomId: roomId.toString() });
+  } catch (error) {
+    console.error('Room creation failed:', error);
+    return c.json({ error: 'Failed to create room' }, 500);
+  }
+});
+
 // 404 handler for API routes
 app.notFound((c) => {
   if (c.req.path.startsWith('/api/')) {
@@ -33,3 +48,4 @@ app.notFound((c) => {
 });
 
 export default app;
+export { RoomObject };

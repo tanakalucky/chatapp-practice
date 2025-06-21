@@ -1,4 +1,6 @@
-export type Env = Record<string, unknown>;
+export type Env = {
+  ROOM: DurableObjectNamespace;
+} & Record<string, unknown>;
 
 // Type guard for environment validation
 export function validateEnv(env: unknown): env is Env {

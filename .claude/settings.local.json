@@ -14,9 +14,13 @@
       "Bash(ls:*)",
       "Bash(wrangler auth:*)",
       "Bash(npx wrangler auth:*)",
-      "Bash(npx wrangler:*)"
+      "Bash(npx wrangler:*)",
+      "mcp__cloudflare-document__search_cloudflare_documentation",
+      "Bash(npm run check:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": []
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": ["cloudflare-document"]
 }
