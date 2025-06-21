@@ -34,7 +34,7 @@
     "preview": {
       "name": "chatapp-practice-preview"
     },
-    "main": {
+    "production": {
       "name": "chatapp-practice"
     }
   }

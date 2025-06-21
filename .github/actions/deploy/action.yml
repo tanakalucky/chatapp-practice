@@ -10,10 +10,10 @@ inputs:
     description: Cloudflare account ID
     required: true
 
-  branch-name:
-    description: "Branch name for deployment"
+  environment:
+    description: "Cloudflare environment for deployment"
     required: false
-    default: "main"
+    default: "production"
 
 runs:
   using: "composite"
@@ -37,4 +37,6 @@ runs:
       with:
         apiToken: ${{ inputs.cloudflare-api-token }}
         accountId: ${{ inputs.cloudflare-account-id }}
-        command: deploy --env ${{ inputs.branch-name }}
+        command: deploy
+      env:
+        CLOUDFLARE_ENV: ${{ inputs.environment }}
