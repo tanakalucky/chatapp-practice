@@ -14,7 +14,15 @@ app.use(
   cors({
     origin: ['http://localhost:5173', 'https://your-domain.com'],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowHeaders: ['Content-Type', 'Authorization'],
+    allowHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Upgrade',
+      'Connection',
+      'Sec-WebSocket-Key',
+      'Sec-WebSocket-Version',
+      'Sec-WebSocket-Protocol',
+    ],
   }),
 );
 
@@ -97,25 +105,35 @@ app.get('/api/rooms/:id/messages', async (c) => {
 app.get('/api/rooms/:id/ws', async (c) => {
   try {
     const upgradeHeader = c.req.header('upgrade');
+    console.log('WebSocket upgrade request:', {
+      upgradeHeader,
+      url: c.req.url,
+    });
+
     if (upgradeHeader !== 'websocket') {
+      console.log('Invalid upgrade header:', upgradeHeader);
       return c.text('Expected Upgrade: websocket', 426);
     }
 
     const roomId = c.req.param('id');
+    console.log('WebSocket connection for room:', roomId);
 
     // Durable ObjectのIDを作成
     const durableObjectId = c.env.ROOM.idFromString(roomId);
     const roomObject = c.env.ROOM.get(durableObjectId);
 
     // WebSocketリクエストをDurable Objectに転送
-    return roomObject.fetch(
+    const response = await roomObject.fetch(
       new Request('https://room/websocket', {
         headers: c.req.raw.headers,
       }),
     );
+
+    console.log('WebSocket response from Durable Object:', response.status);
+    return response;
   } catch (error) {
     console.error('WebSocket connection failed:', error);
-    return c.text('WebSocket connection failed', 500);
+    return c.text(`WebSocket connection failed: ${error}`, 500);
   }
 });
 

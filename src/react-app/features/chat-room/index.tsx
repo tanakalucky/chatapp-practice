@@ -1,6 +1,6 @@
+import type { Message, WebSocketMessage } from '@/types/chat';
 import { useCallback, useEffect, useState } from 'react';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
-import type { Message, WebSocketMessage } from '../../types/chat';
 import { MessageForm } from './components/MessageForm';
 import { MessageList } from './components/MessageList';
 import { useMessages } from './hooks/useMessages';
@@ -47,8 +47,17 @@ export function ChatRoomPage({ params }: ChatRoomPageProps) {
     roomId: params.id,
     author: author || 'Anonymous',
     onMessage: handleWebSocketMessage,
-    onOpen: () => setConnectionStatus('connected'),
-    onClose: () => setConnectionStatus('disconnected'),
+    onOpen: () => {
+      console.log('Chat room WebSocket connected');
+      setConnectionStatus('connected');
+    },
+    onClose: () => {
+      console.log('Chat room WebSocket disconnected');
+      setConnectionStatus('disconnected');
+    },
+    onError: (error) => {
+      console.error('Chat room WebSocket error:', error);
+    },
   });
 
   // 接続ステータスの更新

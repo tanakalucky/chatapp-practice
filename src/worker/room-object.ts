@@ -7,7 +7,6 @@ import type {
   SendMessageResponse,
   WebSocketMessage,
 } from '../types/chat';
-import type { Env } from './env';
 
 export class RoomObject extends DurableObject {
   async fetch(request: Request): Promise<Response> {
@@ -17,8 +16,12 @@ export class RoomObject extends DurableObject {
     try {
       // WebSocket接続の処理
       if (path === '/websocket') {
+        console.log('RoomObject: WebSocket connection request');
         const upgradeHeader = request.headers.get('Upgrade');
+        console.log('RoomObject: Upgrade header:', upgradeHeader);
+
         if (!upgradeHeader || upgradeHeader !== 'websocket') {
+          console.log('RoomObject: Invalid upgrade header');
           return new Response('Expected Upgrade: websocket', { status: 426 });
         }
 
@@ -27,6 +30,7 @@ export class RoomObject extends DurableObject {
 
         // WebSocket Hibernation APIを使用
         this.ctx.acceptWebSocket(server);
+        console.log('RoomObject: WebSocket accepted');
 
         return new Response(null, {
           status: 101,
@@ -52,6 +56,7 @@ export class RoomObject extends DurableObject {
 
   // WebSocket Hibernation API ハンドラー
   async webSocketMessage(ws: WebSocket, message: string) {
+    console.log('RoomObject: Received WebSocket message:', message);
     try {
       const data: WebSocketMessage = JSON.parse(message);
 
@@ -69,6 +74,7 @@ export class RoomObject extends DurableObject {
         };
 
         await this.ctx.storage.put(`message:${messageId}`, savedMessage);
+        console.log('RoomObject: Message saved to storage:', messageId);
 
         // 接続中の全てのWebSocketクライアントにブロードキャスト
         const broadcast: WebSocketMessage = {
@@ -79,7 +85,14 @@ export class RoomObject extends DurableObject {
           messageId: messageId,
         };
 
-        for (const client of this.ctx.getWebSockets()) {
+        const connectedClients = this.ctx.getWebSockets();
+        console.log(
+          'RoomObject: Broadcasting to',
+          connectedClients.length,
+          'clients',
+        );
+
+        for (const client of connectedClients) {
           try {
             client.send(JSON.stringify(broadcast));
           } catch (error) {
