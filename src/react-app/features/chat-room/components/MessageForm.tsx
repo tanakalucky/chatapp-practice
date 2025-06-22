@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useSendMessage } from '../hooks/useSendMessage';
 
@@ -8,6 +9,7 @@ interface MessageFormProps {
 export function MessageForm({ roomId }: MessageFormProps) {
   const [content, setContent] = useState('');
   const [author, setAuthor] = useState('');
+  const queryClient = useQueryClient();
   const sendMessageMutation = useSendMessage(roomId);
 
   // localStorage から名前を読み込み
@@ -34,6 +36,8 @@ export function MessageForm({ roomId }: MessageFormProps) {
       {
         onSuccess: () => {
           setContent('');
+          // メッセージ送信成功後に履歴を再取得
+          queryClient.invalidateQueries({ queryKey: ['messages', roomId] });
         },
         onError: (error) => {
           console.error('Failed to send message:', error);

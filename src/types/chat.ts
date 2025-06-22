@@ -17,6 +17,12 @@ export interface SendMessageResponse {
   error?: string;
 }
 
+export interface GetMessagesResponse {
+  success: boolean;
+  messages?: Message[];
+  error?: string;
+}
+
 export interface RoomInfo {
   id: string;
   messageCount: number;

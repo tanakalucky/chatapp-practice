@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
-import type { SendMessageResponse } from '../types/chat';
+import type { GetMessagesResponse, SendMessageResponse } from '../types/chat';
 import type { Env } from './env';
 import { RoomObject } from './room-object';
 
@@ -65,6 +65,31 @@ app.post('/api/rooms/:id/messages', async (c) => {
   } catch (error) {
     console.error('Message send failed:', error);
     return c.json({ success: false, error: 'Failed to send message' }, 500);
+  }
+});
+
+// メッセージ履歴取得API
+app.get('/api/rooms/:id/messages', async (c) => {
+  try {
+    const roomId = c.req.param('id');
+
+    // Durable ObjectのIDを作成
+    const durableObjectId = c.env.ROOM.idFromString(roomId);
+    const roomObject = c.env.ROOM.get(durableObjectId);
+
+    // Durable Objectにリクエストを転送
+    const response = await roomObject.fetch(
+      new Request('https://room/messages', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+
+    const result = (await response.json()) as GetMessagesResponse;
+    return c.json(result);
+  } catch (error) {
+    console.error('Message fetch failed:', error);
+    return c.json({ success: false, error: 'Failed to fetch messages' }, 500);
   }
 });
 
