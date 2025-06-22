@@ -20,7 +20,8 @@
       "Bash(npx tsc:*)",
       "Bash(npm test:*)",
       "Bash(rm:*)",
-      "Bash(npm run test:*)"
+      "Bash(npm run test:*)",
+      "Bash(npm run biome-check:*)"
     ],
     "deny": []
   },
