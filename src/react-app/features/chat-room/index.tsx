@@ -121,7 +121,7 @@ export function ChatRoomPage({ params }: ChatRoomPageProps) {
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex flex-col'>
-      <div className='bg-gray-800/50 backdrop-blur-sm p-4 border-b border-gray-700'>
+      <div className='h-16 bg-gray-800/50 backdrop-blur-sm p-4 border-b border-gray-700'>
         <div className='flex items-center justify-between'>
           <h1 className='text-xl font-semibold text-white'>Chat Room</h1>
           <div className='flex items-center gap-3'>
@@ -149,7 +149,7 @@ export function ChatRoomPage({ params }: ChatRoomPageProps) {
 
       <MessageList messages={allMessages} />
 
-      <div className='border-t border-gray-700 bg-gray-800/50 backdrop-blur-sm p-4'>
+      <div className='h-20 border-t border-gray-700 bg-gray-800/50 backdrop-blur-sm p-4'>
         <MessageForm
           roomId={params.id}
           author={author}

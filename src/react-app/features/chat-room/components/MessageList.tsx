@@ -32,7 +32,7 @@ export function MessageList({ messages }: MessageListProps) {
   return (
     <div
       ref={scrollRef}
-      className='flex-1 overflow-y-auto p-4 space-y-4 max-h-full'
+      className='flex-1 overflow-y-auto p-4 space-y-4 max-h-[calc(100vh-9rem)]'
     >
       {messages.map((message) => (
         <div
