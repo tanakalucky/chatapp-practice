@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useSendMessage } from '../hooks/useSendMessage';
 
 interface MessageFormProps {
@@ -16,21 +16,11 @@ export function MessageForm({
   isConnected,
 }: MessageFormProps) {
   const [content, setContent] = useState('');
-  const [isLocalAuthor, setIsLocalAuthor] = useState(author);
   const queryClient = useQueryClient();
   const sendMessageMutation = useSendMessage(roomId);
 
-  useEffect(() => {
-    setIsLocalAuthor(author);
-  }, [author]);
-
-  const handleAuthorChange = (value: string) => {
-    setIsLocalAuthor(value);
-    localStorage.setItem('chat-author', value);
-  };
-
   const sendMessage = () => {
-    if (!content.trim() || !isLocalAuthor.trim()) {
+    if (!content.trim() || !author.trim()) {
       return;
     }
 
@@ -51,7 +41,7 @@ export function MessageForm({
 
   const fallbackToHttpSend = () => {
     sendMessageMutation.mutate(
-      { content: content.trim(), author: isLocalAuthor.trim() },
+      { content: content.trim(), author: author.trim() },
       {
         onSuccess: () => {
           setContent('');
@@ -84,18 +74,6 @@ export function MessageForm({
   return (
     <div className='w-full max-w-4xl mx-auto'>
       <form onSubmit={handleSubmit} className='flex gap-3 items-start'>
-        {/* Name input */}
-        <div className='flex-shrink-0'>
-          <input
-            type='text'
-            value={isLocalAuthor}
-            onChange={(e) => handleAuthorChange(e.target.value)}
-            placeholder='Your name'
-            className='w-32 px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
-            disabled={sendMessageMutation.isPending}
-          />
-        </div>
-
         {/* Message input */}
         <div className='flex-1'>
           <textarea
@@ -113,9 +91,7 @@ export function MessageForm({
         <button
           type='submit'
           disabled={
-            !content.trim() ||
-            !isLocalAuthor.trim() ||
-            sendMessageMutation.isPending
+            !content.trim() || !author.trim() || sendMessageMutation.isPending
           }
           className={`flex-shrink-0 px-4 py-2 text-white text-sm font-medium rounded-md transition-colors duration-200 ${
             isConnected

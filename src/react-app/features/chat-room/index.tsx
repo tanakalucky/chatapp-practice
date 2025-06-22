@@ -1,6 +1,7 @@
 import type { Message, WebSocketMessage } from '@/types/chat';
 import { useCallback, useEffect, useState } from 'react';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { EditableUsername } from './components/EditableUsername';
 import { MessageForm } from './components/MessageForm';
 import { MessageList } from './components/MessageList';
 import { useMessages } from './hooks/useMessages';
@@ -81,6 +82,11 @@ export function ChatRoomPage({ params }: ChatRoomPageProps) {
     }
   }, [author]);
 
+  const handleUsernameChange = (newUsername: string) => {
+    setAuthor(newUsername);
+    localStorage.setItem('chat-author', newUsername);
+  };
+
   if (isLoading) {
     return (
       <div className='min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center'>
@@ -119,7 +125,10 @@ export function ChatRoomPage({ params }: ChatRoomPageProps) {
         <div className='flex items-center justify-between'>
           <h1 className='text-xl font-semibold text-white'>Chat Room</h1>
           <div className='flex items-center gap-3'>
-            <span className='text-sm text-gray-400'>as {author}</span>
+            <EditableUsername
+              username={author}
+              onUsernameChange={handleUsernameChange}
+            />
             <div className='flex items-center gap-2'>
               <div
                 className={`w-2 h-2 rounded-full ${
