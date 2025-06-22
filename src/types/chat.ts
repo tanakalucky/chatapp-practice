@@ -28,3 +28,12 @@ export interface RoomInfo {
   messageCount: number;
   createdAt: string;
 }
+
+export interface WebSocketMessage {
+  type: 'message' | 'error' | 'connection';
+  content: string;
+  author: string;
+  timestamp?: string;
+  messageId?: string;
+  message?: string; // for error type
+}

@@ -4,35 +4,56 @@ import { useSendMessage } from '../hooks/useSendMessage';
 
 interface MessageFormProps {
   roomId: string;
+  author: string;
+  onSendMessage: (content: string) => boolean;
+  isConnected: boolean;
 }
 
-export function MessageForm({ roomId }: MessageFormProps) {
+export function MessageForm({
+  roomId,
+  author,
+  onSendMessage,
+  isConnected,
+}: MessageFormProps) {
   const [content, setContent] = useState('');
-  const [author, setAuthor] = useState('');
+  const [isLocalAuthor, setIsLocalAuthor] = useState(author);
   const queryClient = useQueryClient();
   const sendMessageMutation = useSendMessage(roomId);
 
-  // localStorage から名前を読み込み
+  // ローカルユーザー名を初期化
   useEffect(() => {
-    const savedAuthor = localStorage.getItem('chatAuthor');
-    if (savedAuthor) {
-      setAuthor(savedAuthor);
-    }
-  }, []);
+    setIsLocalAuthor(author);
+  }, [author]);
 
   // 名前が変更されたら localStorage に保存
   const handleAuthorChange = (value: string) => {
-    setAuthor(value);
-    localStorage.setItem('chatAuthor', value);
+    setIsLocalAuthor(value);
+    localStorage.setItem('chat-author', value);
   };
 
   const sendMessage = () => {
-    if (!content.trim() || !author.trim()) {
+    if (!content.trim() || !isLocalAuthor.trim()) {
       return;
     }
 
+    // WebSocketが接続されている場合はWebSocketで送信、でなければHTTP APIを使用
+    if (isConnected) {
+      const success = onSendMessage(content.trim());
+      if (success) {
+        setContent('');
+      } else {
+        // WebSocket送信に失敗した場合はHTTP APIにフォールバック
+        fallbackToHttpSend();
+      }
+    } else {
+      // WebSocketが接続されていない場合はHTTP APIを使用
+      fallbackToHttpSend();
+    }
+  };
+
+  const fallbackToHttpSend = () => {
     sendMessageMutation.mutate(
-      { content: content.trim(), author: author.trim() },
+      { content: content.trim(), author: isLocalAuthor.trim() },
       {
         onSuccess: () => {
           setContent('');
@@ -65,7 +86,7 @@ export function MessageForm({ roomId }: MessageFormProps) {
         <div className='flex-shrink-0'>
           <input
             type='text'
-            value={author}
+            value={isLocalAuthor}
             onChange={(e) => handleAuthorChange(e.target.value)}
             placeholder='Your name'
             className='w-32 px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
@@ -90,11 +111,21 @@ export function MessageForm({ roomId }: MessageFormProps) {
         <button
           type='submit'
           disabled={
-            !content.trim() || !author.trim() || sendMessageMutation.isPending
+            !content.trim() ||
+            !isLocalAuthor.trim() ||
+            sendMessageMutation.isPending
           }
-          className='flex-shrink-0 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white text-sm font-medium rounded-md transition-colors duration-200'
+          className={`flex-shrink-0 px-4 py-2 text-white text-sm font-medium rounded-md transition-colors duration-200 ${
+            isConnected
+              ? 'bg-green-600 hover:bg-green-700'
+              : 'bg-blue-600 hover:bg-blue-700'
+          } disabled:bg-gray-600 disabled:cursor-not-allowed`}
         >
-          {sendMessageMutation.isPending ? 'Sending...' : 'Send'}
+          {sendMessageMutation.isPending
+            ? 'Sending...'
+            : isConnected
+              ? 'Send (RT)'
+              : 'Send'}
         </button>
       </form>
 

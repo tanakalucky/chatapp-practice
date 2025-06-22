@@ -93,6 +93,32 @@ app.get('/api/rooms/:id/messages', async (c) => {
   }
 });
 
+// WebSocket接続API
+app.get('/api/rooms/:id/ws', async (c) => {
+  try {
+    const upgradeHeader = c.req.header('upgrade');
+    if (upgradeHeader !== 'websocket') {
+      return c.text('Expected Upgrade: websocket', 426);
+    }
+
+    const roomId = c.req.param('id');
+
+    // Durable ObjectのIDを作成
+    const durableObjectId = c.env.ROOM.idFromString(roomId);
+    const roomObject = c.env.ROOM.get(durableObjectId);
+
+    // WebSocketリクエストをDurable Objectに転送
+    return roomObject.fetch(
+      new Request('https://room/websocket', {
+        headers: c.req.raw.headers,
+      }),
+    );
+  } catch (error) {
+    console.error('WebSocket connection failed:', error);
+    return c.text('WebSocket connection failed', 500);
+  }
+});
+
 // 404 handler for API routes
 app.notFound((c) => {
   if (c.req.path.startsWith('/api/')) {

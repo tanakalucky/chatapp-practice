@@ -5,7 +5,9 @@ import type {
   Message,
   SendMessageRequest,
   SendMessageResponse,
+  WebSocketMessage,
 } from '../types/chat';
+import type { Env } from './env';
 
 export class RoomObject extends DurableObject {
   async fetch(request: Request): Promise<Response> {
@@ -13,6 +15,25 @@ export class RoomObject extends DurableObject {
     const path = url.pathname;
 
     try {
+      // WebSocket接続の処理
+      if (path === '/websocket') {
+        const upgradeHeader = request.headers.get('Upgrade');
+        if (!upgradeHeader || upgradeHeader !== 'websocket') {
+          return new Response('Expected Upgrade: websocket', { status: 426 });
+        }
+
+        const webSocketPair = new WebSocketPair();
+        const [client, server] = Object.values(webSocketPair);
+
+        // WebSocket Hibernation APIを使用
+        this.ctx.acceptWebSocket(server);
+
+        return new Response(null, {
+          status: 101,
+          webSocket: client,
+        });
+      }
+
       if (request.method === 'POST' && path === '/messages') {
         return await this.handleSendMessage(request);
       }
@@ -27,6 +48,65 @@ export class RoomObject extends DurableObject {
       console.error('RoomObject fetch error:', error);
       return new Response('Internal Server Error', { status: 500 });
     }
+  }
+
+  // WebSocket Hibernation API ハンドラー
+  async webSocketMessage(ws: WebSocket, message: string) {
+    try {
+      const data: WebSocketMessage = JSON.parse(message);
+
+      if (data.type === 'message') {
+        // メッセージをストレージに保存
+        const messageId = ulid();
+        const roomId = this.ctx.id.toString();
+
+        const savedMessage: Message = {
+          id: messageId,
+          content: data.content,
+          author: data.author,
+          timestamp: new Date().toISOString(),
+          roomId,
+        };
+
+        await this.ctx.storage.put(`message:${messageId}`, savedMessage);
+
+        // 接続中の全てのWebSocketクライアントにブロードキャスト
+        const broadcast: WebSocketMessage = {
+          type: 'message',
+          content: data.content,
+          author: data.author,
+          timestamp: savedMessage.timestamp,
+          messageId: messageId,
+        };
+
+        for (const client of this.ctx.getWebSockets()) {
+          try {
+            client.send(JSON.stringify(broadcast));
+          } catch (error) {
+            console.error('Failed to send message to client:', error);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error handling WebSocket message:', error);
+      ws.send(
+        JSON.stringify({ type: 'error', message: 'Failed to process message' }),
+      );
+    }
+  }
+
+  async webSocketClose(
+    ws: WebSocket,
+    code: number,
+    reason: string,
+    wasClean: boolean,
+  ) {
+    // クライアントが切断された際の処理
+    console.log('WebSocket client disconnected:', { code, reason, wasClean });
+  }
+
+  async webSocketError(ws: WebSocket, error: unknown) {
+    console.error('WebSocket error:', error);
   }
 
   private async handleSendMessage(request: Request): Promise<Response> {
@@ -58,6 +138,23 @@ export class RoomObject extends DurableObject {
 
       // Durable Object Storageに保存
       await this.ctx.storage.put(`message:${messageId}`, message);
+
+      // WebSocketクライアントにもブロードキャスト
+      const broadcast: WebSocketMessage = {
+        type: 'message',
+        content: message.content,
+        author: message.author,
+        timestamp: message.timestamp,
+        messageId: messageId,
+      };
+
+      for (const client of this.ctx.getWebSockets()) {
+        try {
+          client.send(JSON.stringify(broadcast));
+        } catch (error) {
+          console.error('Failed to send message to WebSocket client:', error);
+        }
+      }
 
       const response: SendMessageResponse = {
         success: true,
