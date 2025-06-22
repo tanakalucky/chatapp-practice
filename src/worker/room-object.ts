@@ -109,7 +109,7 @@ export class RoomObject extends DurableObject {
   }
 
   async webSocketClose(
-    ws: WebSocket,
+    _ws: WebSocket,
     code: number,
     reason: string,
     wasClean: boolean,
@@ -118,7 +118,7 @@ export class RoomObject extends DurableObject {
     console.log('WebSocket client disconnected:', { code, reason, wasClean });
   }
 
-  async webSocketError(ws: WebSocket, error: unknown) {
+  async webSocketError(_ws: WebSocket, error: unknown) {
     console.error('WebSocket error:', error);
   }
 
