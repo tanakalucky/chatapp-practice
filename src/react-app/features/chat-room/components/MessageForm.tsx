@@ -20,12 +20,10 @@ export function MessageForm({
   const queryClient = useQueryClient();
   const sendMessageMutation = useSendMessage(roomId);
 
-  // ローカルユーザー名を初期化
   useEffect(() => {
     setIsLocalAuthor(author);
   }, [author]);
 
-  // 名前が変更されたら localStorage に保存
   const handleAuthorChange = (value: string) => {
     setIsLocalAuthor(value);
     localStorage.setItem('chat-author', value);

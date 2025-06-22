@@ -19,7 +19,6 @@ export function ChatRoomPage({ params }: ChatRoomPageProps) {
 
   const { data: messagesResponse, isLoading, error } = useMessages(params.id);
 
-  // WebSocketメッセージの処理
   const handleWebSocketMessage = useCallback(
     (wsMessage: WebSocketMessage) => {
       if (wsMessage.type === 'message' && wsMessage.messageId) {
@@ -32,7 +31,6 @@ export function ChatRoomPage({ params }: ChatRoomPageProps) {
         };
 
         setRealtimeMessages((prev) => {
-          // 重複を防ぐため、既存のメッセージIDをチェック
           if (prev.some((m) => m.id === message.id)) {
             return prev;
           }
@@ -60,7 +58,6 @@ export function ChatRoomPage({ params }: ChatRoomPageProps) {
     },
   });
 
-  // 接続ステータスの更新
   useEffect(() => {
     if (isConnecting) {
       setConnectionStatus('connecting');
@@ -71,7 +68,6 @@ export function ChatRoomPage({ params }: ChatRoomPageProps) {
     }
   }, [isConnected, isConnecting]);
 
-  // ユーザー名の設定
   useEffect(() => {
     if (!author) {
       const savedAuthor = localStorage.getItem('chat-author');
@@ -106,7 +102,6 @@ export function ChatRoomPage({ params }: ChatRoomPageProps) {
     );
   }
 
-  // 初期メッセージとリアルタイムメッセージを結合
   const initialMessages = messagesResponse?.success
     ? messagesResponse.messages || []
     : [];
@@ -114,14 +109,12 @@ export function ChatRoomPage({ params }: ChatRoomPageProps) {
   const allMessages = [...initialMessages, ...realtimeMessages]
     .filter(
       (message, index, array) =>
-        // 重複を除去（IDベース）
         array.findIndex((m) => m.id === message.id) === index,
     )
     .sort((a, b) => a.id.localeCompare(b.id)); // ULIDでソート
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex flex-col'>
-      {/* ヘッダー - 接続状態表示 */}
       <div className='bg-gray-800/50 backdrop-blur-sm p-4 border-b border-gray-700'>
         <div className='flex items-center justify-between'>
           <h1 className='text-xl font-semibold text-white'>Chat Room</h1>
@@ -145,10 +138,8 @@ export function ChatRoomPage({ params }: ChatRoomPageProps) {
         </div>
       </div>
 
-      {/* メッセージエリア */}
       <MessageList messages={allMessages} />
 
-      {/* 入力エリア - 下部固定 */}
       <div className='border-t border-gray-700 bg-gray-800/50 backdrop-blur-sm p-4'>
         <MessageForm
           roomId={params.id}

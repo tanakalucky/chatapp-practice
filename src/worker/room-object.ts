@@ -14,7 +14,6 @@ export class RoomObject extends DurableObject {
     const path = url.pathname;
 
     try {
-      // WebSocket接続の処理
       if (path === '/websocket') {
         console.log('RoomObject: WebSocket connection request');
         const upgradeHeader = request.headers.get('Upgrade');
@@ -28,7 +27,6 @@ export class RoomObject extends DurableObject {
         const webSocketPair = new WebSocketPair();
         const [client, server] = Object.values(webSocketPair);
 
-        // WebSocket Hibernation APIを使用
         this.ctx.acceptWebSocket(server);
         console.log('RoomObject: WebSocket accepted');
 
@@ -46,7 +44,6 @@ export class RoomObject extends DurableObject {
         return await this.handleGetMessages();
       }
 
-      // デフォルトレスポンス
       return new Response('Room object created', { status: 200 });
     } catch (error) {
       console.error('RoomObject fetch error:', error);
@@ -54,14 +51,12 @@ export class RoomObject extends DurableObject {
     }
   }
 
-  // WebSocket Hibernation API ハンドラー
   async webSocketMessage(ws: WebSocket, message: string) {
     console.log('RoomObject: Received WebSocket message:', message);
     try {
       const data: WebSocketMessage = JSON.parse(message);
 
       if (data.type === 'message') {
-        // メッセージをストレージに保存
         const messageId = ulid();
         const roomId = this.ctx.id.toString();
 
@@ -76,7 +71,6 @@ export class RoomObject extends DurableObject {
         await this.ctx.storage.put(`message:${messageId}`, savedMessage);
         console.log('RoomObject: Message saved to storage:', messageId);
 
-        // 接続中の全てのWebSocketクライアントにブロードキャスト
         const broadcast: WebSocketMessage = {
           type: 'message',
           content: data.content,
@@ -114,7 +108,6 @@ export class RoomObject extends DurableObject {
     reason: string,
     wasClean: boolean,
   ) {
-    // クライアントが切断された際の処理
     console.log('WebSocket client disconnected:', { code, reason, wasClean });
   }
 
@@ -137,7 +130,6 @@ export class RoomObject extends DurableObject {
         });
       }
 
-      // ULIDでユニークなメッセージIDを生成
       const messageId = ulid();
       const roomId = this.ctx.id.toString();
 
@@ -149,10 +141,8 @@ export class RoomObject extends DurableObject {
         roomId,
       };
 
-      // Durable Object Storageに保存
       await this.ctx.storage.put(`message:${messageId}`, message);
 
-      // WebSocketクライアントにもブロードキャスト
       const broadcast: WebSocketMessage = {
         type: 'message',
         content: message.content,
@@ -193,20 +183,17 @@ export class RoomObject extends DurableObject {
 
   private async handleGetMessages(): Promise<Response> {
     try {
-      // Storage から message: プレフィックスのキーを全て取得
       const messages: Message[] = [];
       const messageEntries = await this.ctx.storage.list({
         prefix: 'message:',
       });
 
-      // 全てのメッセージを配列に格納
       for (const [, message] of messageEntries) {
         if (message && typeof message === 'object' && 'id' in message) {
           messages.push(message as Message);
         }
       }
 
-      // ULID で昇順ソート（最新が下になる）
       messages.sort((a, b) => a.id.localeCompare(b.id));
 
       const response: GetMessagesResponse = {

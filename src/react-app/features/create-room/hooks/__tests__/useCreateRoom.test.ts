@@ -4,17 +4,14 @@ import { type ReactNode, createElement } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useCreateRoom } from '../useCreateRoom';
 
-// Wouter routerのモック
 const mockSetLocation = vi.fn();
 vi.mock('wouter', () => ({
   useLocation: () => ['/current', mockSetLocation],
 }));
 
-// fetchのモック
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
-// テスト用のQueryClientProvider wrapper
 const createWrapper = () => {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -48,7 +45,6 @@ describe('useCreateRoom', () => {
       wrapper: createWrapper(),
     });
 
-    // mutation実行
     result.current.mutate();
 
     // mutationの状態確認を先に行う
@@ -78,7 +74,6 @@ describe('useCreateRoom', () => {
       wrapper: createWrapper(),
     });
 
-    // mutation実行
     result.current.mutate();
 
     // エラー状態の確認
@@ -106,7 +101,6 @@ describe('useCreateRoom', () => {
       wrapper: createWrapper(),
     });
 
-    // mutation実行
     result.current.mutate();
 
     // ローディング状態の確認（非同期で状態が変わるのを待つ）
@@ -136,7 +130,6 @@ describe('useCreateRoom', () => {
       wrapper: createWrapper(),
     });
 
-    // mutation実行
     result.current.mutate();
 
     // エラー状態の確認

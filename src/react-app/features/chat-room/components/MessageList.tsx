@@ -8,7 +8,6 @@ interface MessageListProps {
 export function MessageList({ messages }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // 新しいメッセージが追加されたら最下部にスクロール
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;

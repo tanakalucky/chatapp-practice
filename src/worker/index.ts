@@ -7,7 +7,6 @@ import { RoomObject } from './room-object';
 
 const app = new Hono<{ Bindings: Env }>();
 
-// Middleware
 app.use('*', logger());
 app.use(
   '/api/*',
@@ -26,20 +25,16 @@ app.use(
   }),
 );
 
-// API Routes
 app.get('/api/', (c) => c.json({ name: 'Cloudflare', version: '1.0.0' }));
 
 app.get('/api/health', (c) =>
   c.json({ status: 'ok', timestamp: new Date().toISOString() }),
 );
 
-// 部屋作成API
 app.post('/api/rooms', async (c) => {
   try {
-    // 新しいDurable ObjectのIDを生成
     const roomId = c.env.ROOM.newUniqueId();
 
-    // 部屋IDを文字列として返す
     return c.json({ roomId: roomId.toString() });
   } catch (error) {
     console.error('Room creation failed:', error);
@@ -47,19 +42,15 @@ app.post('/api/rooms', async (c) => {
   }
 });
 
-// メッセージ送信API
 app.post('/api/rooms/:id/messages', async (c) => {
   try {
     const roomId = c.req.param('id');
 
-    // Durable ObjectのIDを作成
     const durableObjectId = c.env.ROOM.idFromString(roomId);
     const roomObject = c.env.ROOM.get(durableObjectId);
 
-    // リクエストボディを取得
     const body = await c.req.json();
 
-    // Durable Objectにリクエストを転送
     const response = await roomObject.fetch(
       new Request('https://room/messages', {
         method: 'POST',
@@ -76,16 +67,13 @@ app.post('/api/rooms/:id/messages', async (c) => {
   }
 });
 
-// メッセージ履歴取得API
 app.get('/api/rooms/:id/messages', async (c) => {
   try {
     const roomId = c.req.param('id');
 
-    // Durable ObjectのIDを作成
     const durableObjectId = c.env.ROOM.idFromString(roomId);
     const roomObject = c.env.ROOM.get(durableObjectId);
 
-    // Durable Objectにリクエストを転送
     const response = await roomObject.fetch(
       new Request('https://room/messages', {
         method: 'GET',
@@ -101,7 +89,6 @@ app.get('/api/rooms/:id/messages', async (c) => {
   }
 });
 
-// WebSocket接続API
 app.get('/api/rooms/:id/ws', async (c) => {
   try {
     const upgradeHeader = c.req.header('upgrade');
@@ -118,11 +105,9 @@ app.get('/api/rooms/:id/ws', async (c) => {
     const roomId = c.req.param('id');
     console.log('WebSocket connection for room:', roomId);
 
-    // Durable ObjectのIDを作成
     const durableObjectId = c.env.ROOM.idFromString(roomId);
     const roomObject = c.env.ROOM.get(durableObjectId);
 
-    // WebSocketリクエストをDurable Objectに転送
     const response = await roomObject.fetch(
       new Request('https://room/websocket', {
         headers: c.req.raw.headers,
@@ -137,12 +122,10 @@ app.get('/api/rooms/:id/ws', async (c) => {
   }
 });
 
-// 404 handler for API routes
 app.notFound((c) => {
   if (c.req.path.startsWith('/api/')) {
     return c.json({ error: 'Not Found' }, 404);
   }
-  // For non-API routes, let the client handle routing
   return c.redirect('/');
 });
 

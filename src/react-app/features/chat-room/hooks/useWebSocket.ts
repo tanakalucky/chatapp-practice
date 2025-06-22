@@ -25,7 +25,6 @@ export function useWebSocket({
   const reconnectAttemptsRef = useRef(0);
   const maxReconnectAttempts = 5;
 
-  // コールバック関数をref化して依存関係を安定化
   const onMessageRef = useRef(onMessage);
   const onErrorRef = useRef(onError);
   const onOpenRef = useRef(onOpen);
@@ -52,7 +51,6 @@ export function useWebSocket({
       return;
     }
 
-    // 既存の接続をクリーンアップ
     if (wsRef.current) {
       wsRef.current.close();
       wsRef.current = null;
