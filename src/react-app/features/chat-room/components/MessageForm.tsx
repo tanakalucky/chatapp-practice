@@ -71,7 +71,11 @@ export function MessageForm({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (
+      e.key === 'Enter' &&
+      !e.shiftKey &&
+      !(e.nativeEvent as KeyboardEvent).isComposing
+    ) {
       e.preventDefault();
       sendMessage();
     }
