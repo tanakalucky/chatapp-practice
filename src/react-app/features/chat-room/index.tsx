@@ -6,26 +6,20 @@ interface ChatRoomPageProps {
 
 export function ChatRoomPage({ params }: ChatRoomPageProps) {
   return (
-    <div className='min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex flex-col items-center justify-center px-4'>
-      <div className='text-center space-y-8 max-w-2xl w-full'>
-        <div className='space-y-3'>
-          <h1 className='text-4xl font-bold text-white tracking-tight'>
-            Chat Room
+    <div className='min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex flex-col'>
+      {/* メッセージエリア - 将来メッセージ表示に使用 */}
+      <div className='flex-1 flex items-center justify-center'>
+        <div className='text-center'>
+          <h1 className='text-2xl font-semibold text-gray-400 mb-2'>
+            Welcome to the chat room
           </h1>
-          <div className='bg-gray-800 border border-gray-700 rounded-xl px-6 py-4'>
-            <p className='text-gray-400 text-sm uppercase tracking-wider font-medium mb-1'>
-              Room ID
-            </p>
-            <p className='text-white font-mono text-lg break-all'>
-              {params.id}
-            </p>
-          </div>
+          <p className='text-gray-500 text-sm'>Messages will appear here</p>
         </div>
+      </div>
 
-        <div className='space-y-4'>
-          <h2 className='text-xl font-semibold text-white'>Send a Message</h2>
-          <MessageForm roomId={params.id} />
-        </div>
+      {/* 入力エリア - 下部固定 */}
+      <div className='border-t border-gray-700 bg-gray-800/50 backdrop-blur-sm p-4'>
+        <MessageForm roomId={params.id} />
       </div>
     </div>
   );
